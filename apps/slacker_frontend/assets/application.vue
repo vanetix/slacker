@@ -75,6 +75,10 @@ export default {
 
         if (idx !== -1) {
           this.$delete(this.channels, idx);
+
+          if (name === this.currentChannel) {
+            this.currentChannelMessages = [];
+          }
         }
       });
     },
@@ -82,9 +86,11 @@ export default {
     selectChannel(channel) {
       const oldChannel = this.currentChannel;
 
-      this.leaveChannel(oldChannel);
-      this.joinChannel(channel);
+      if (oldChannel != null) {
+        this.leaveChannel(oldChannel);
+      }
 
+      this.joinChannel(channel);
       this.currentChannel = channel;
     },
 

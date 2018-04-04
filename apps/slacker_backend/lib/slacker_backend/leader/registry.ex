@@ -4,6 +4,7 @@ defmodule SlackerBackend.Leader.Registry do
   alias SlackerBackend.NodeRegistry
 
   @table __MODULE__
+  @pg_group __MODULE__
 
   def start_link(_) do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
@@ -18,13 +19,26 @@ defmodule SlackerBackend.Leader.Registry do
       GenServer.cast(__MODULE__, {:register, pid, name})
     end)
 
+    :pg2.create(@pg_group)
     :ets.new(@table, [:protected, :named_table])
 
-    {:ok, %{}}
+    {:ok, %{channels: %{}}}
+  end
+
+  def subscribe(pid) do
+    unless pid in :pg2.get_members(@pg_group) do
+      :pg2.join(@pg_group, pid)
+    end
+  end
+
+  def unsubscribe(pid) do
+    if pid in :pg2.get_members(@pg_group) do
+      :pg2.leave(@pg_group, pid)
+    end
   end
 
   def register(pid, name) when is_pid(pid) and is_binary(name) do
-    for node_name <- NodeRegistry.list() do
+    for %{name: node_name} <- NodeRegistry.list() do
       GenServer.cast({__MODULE__, node_name}, {:register, pid, name})
     end
   end
@@ -54,6 +68,12 @@ defmodule SlackerBackend.Leader.Registry do
 
     :ets.insert(@table, {name, pid})
 
+    @pg_group
+    |> :pg2.get_members()
+    |> Enum.each(fn(pid) ->
+      send(pid, {:new_channel, name})
+    end)
+
     {:noreply, Map.put(state, ref, name)}
   end
 
@@ -61,6 +81,12 @@ defmodule SlackerBackend.Leader.Registry do
     {name, new_state} = Map.pop(state, ref)
 
     :ets.delete(@table, name)
+
+    @pg_group
+    |> :pg2.get_members()
+    |> Enum.each(fn(pid) ->
+      send(pid, {:delete_channel, name})
+    end)
 
     {:noreply, new_state}
   end

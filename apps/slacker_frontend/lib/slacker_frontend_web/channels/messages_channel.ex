@@ -12,15 +12,11 @@ defmodule SlackerFrontendWeb.ChatChannel do
   def handle_in("new-channel", channel_name, socket) do
     SlackerBackend.create(channel_name)
 
-    broadcast!(socket, "new-channel", %{name: channel_name})
-
     {:noreply, socket}
   end
 
   def handle_in("delete-channel", channel_name, socket) do
     SlackerBackend.delete(channel_name)
-
-    broadcast!(socket, "delete-channel", %{name: channel_name})
 
     {:noreply, socket}
   end
@@ -48,6 +44,8 @@ defmodule SlackerFrontendWeb.ChatChannel do
   end
 
   def handle_info(:on_join, socket) do
+    SlackerBackend.subscribe_to_channel_updates(self())
+
     push(socket, "sync", %{channels: SlackerBackend.list_channels()})
 
     {:noreply, socket}
@@ -60,7 +58,13 @@ defmodule SlackerFrontendWeb.ChatChannel do
   end
 
   def handle_info({:new_channel, channel_name}, socket) do
-    push(socket, "new-channel", channel_name)
+    push(socket, "new-channel", %{name: channel_name})
+
+    {:noreply, socket}
+  end
+
+  def handle_info({:delete_channel, channel_name}, socket) do
+    push(socket, "delete-channel", %{name: channel_name})
 
     {:noreply, socket}
   end
