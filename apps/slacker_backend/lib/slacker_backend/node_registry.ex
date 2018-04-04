@@ -4,9 +4,19 @@ defmodule SlackerBackend.NodeRegistry do
   @table __MODULE__
   @pg_group __MODULE__
 
+  @doc """
+  Return a list of maps contain name and active attributes
+  """
   def list() do
+    current = Node.self()
+
     :ets.foldl(fn({name}, acc) ->
-      [name | acc]
+      cur = %{
+        name: name,
+        active: name == current
+      }
+
+      [cur | acc]
     end, [], @table)
   end
 
