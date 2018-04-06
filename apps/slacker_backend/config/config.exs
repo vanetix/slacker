@@ -35,7 +35,7 @@ config :libcluster,
       strategy: Cluster.Strategy.Kubernetes,
       config: [
         mode: :dns,
-        kubernetes_selector: "app=slacker",
+        kubernetes_selector: "elixir-app=slacker",
         kubernetes_node_basename: "slacker"
       ]
     ]
