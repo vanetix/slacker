@@ -51,5 +51,6 @@ release :slacker do
     slacker_backend: :permanent,
     slacker_frontend: :permanent
   ]
+  set vm_args: "rel/vm_args.eex"
 end
 

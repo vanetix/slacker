@@ -5,7 +5,7 @@ pipeline {
     environment {
       ORG               = 'jenkinsx'
       APP_NAME          = 'slacker'
-      GIT_CREDS         = credentials('jenkins-x-git')
+      GIT_CREDS         = credentials('slacker-git')
       CHARTMUSEUM_CREDS = credentials('jenkins-x-chartmuseum')
       GIT_USERNAME      = "$GIT_CREDS_USR"
       GIT_API_TOKEN     = "$GIT_CREDS_PSW"
