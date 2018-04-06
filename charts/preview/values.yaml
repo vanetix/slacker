@@ -16,6 +16,7 @@ cleanup:
     helm.sh/hook-delete-policy: hook-succeeded
 
 preview:
+  replicaCount: 1
   image:
     repository:
     tag:
