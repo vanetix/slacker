@@ -9,6 +9,8 @@ defmodule SlackerBackend do
 
   defdelegate subscribe_to_node_updates(pid), to: NodeRegistry, as: :subscribe
   defdelegate unsubscribe_to_node_updates(pid), to: NodeRegistry, as: :unsubscribe
+  defdelegate subscribe_to_channel_updates(pid), to: Registry, as: :subscribe
+  defdelegate unsubscribe_to_channel_updates(pid), to: Registry, as: :unsubscribe
 
   def list_channels() do
     Registry.list()

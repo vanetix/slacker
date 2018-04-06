@@ -16,6 +16,12 @@ defmodule SlackerBackend.Channel do
 
   defp pg_group(name), do: {:slacker_backend, "channel_#{name}"}
 
+  def members(name) do
+    name
+    |> pg_group()
+    |> :pg2.get_members()
+  end
+
   def join(pid, member_pid) do
     GenServer.cast(pid, {:join, member_pid})
   end

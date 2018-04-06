@@ -4,8 +4,9 @@
     Nodes
   </p>
 
-  <div class="panel-block" v-for="node in nodes" :key="node">
-    <span>{{ node }}</span>
+  <div v-for="node in nodes" :key="node.name"
+    :class="{ 'panel-block': true, active: node.active }">
+    <span>{{ node.name }}</span>
   </div>
 </nav>
 </template>
@@ -35,7 +36,19 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style scoped lang="scss">
 @import "~styles/variables";
 
+.panel-block.active span {
+  position: relative;
+
+  &:after {
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    content: "";
+    border-bottom: 2px solid lighten($cyan, 20%);
+  }
+}
 </style>
