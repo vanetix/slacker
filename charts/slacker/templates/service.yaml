@@ -15,5 +15,8 @@ spec:
     targetPort: {{ .Values.service.internalPort }}
     protocol: TCP
     name: {{ .Values.service.name }}
+  - port: 4369
+    targetPort: 4369
+    name: epmd
   selector:
     app: {{ template "fullname" . }}
