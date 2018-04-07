@@ -1,10 +1,14 @@
 defmodule SlackerBackend.Leader.Registry do
+  @moduledoc """
+  Manages pids of all existing channels on the local node.
+  """
+
   use GenServer
 
   alias SlackerBackend.NodeRegistry
 
   @table __MODULE__
-  @pg_group __MODULE__
+  @subscription_table :channel_subscriptions
 
   def start_link(_) do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
@@ -19,22 +23,18 @@ defmodule SlackerBackend.Leader.Registry do
       GenServer.cast(__MODULE__, {:register, pid, name})
     end)
 
-    :pg2.create(@pg_group)
     :ets.new(@table, [:protected, :named_table])
+    :ets.new(@subscription_table, [:named_table])
 
-    {:ok, %{channels: %{}}}
+    {:ok, %{}}
   end
 
   def subscribe(pid) do
-    unless pid in :pg2.get_members(@pg_group) do
-      :pg2.join(@pg_group, pid)
-    end
+    GenServer.cast(__MODULE__, {:subscribe, pid})
   end
 
   def unsubscribe(pid) do
-    if pid in :pg2.get_members(@pg_group) do
-      :pg2.leave(@pg_group, pid)
-    end
+    GenServer.cast(__MODULE__, {:unsubscribe, pid})
   end
 
   def register(pid, name) when is_pid(pid) and is_binary(name) do
@@ -68,13 +68,21 @@ defmodule SlackerBackend.Leader.Registry do
 
     :ets.insert(@table, {name, pid})
 
-    @pg_group
-    |> :pg2.get_members()
-    |> Enum.each(fn(pid) ->
+    for pid <- get_subscribers() do
       send(pid, {:new_channel, name})
-    end)
+    end
 
     {:noreply, Map.put(state, ref, name)}
+  end
+  def handle_cast({:subscribe, pid}, state) do
+    :ets.insert(@subscription_table, {pid})
+
+    {:noreply, state}
+  end
+  def handle_cast({:unsubscribe, pid}, state) do
+    :ets.delete(@subscription_table, {pid})
+
+    {:noreply, state}
   end
 
   def handle_info({:DOWN, ref, :process, _pid, _reason}, state) do
@@ -82,12 +90,16 @@ defmodule SlackerBackend.Leader.Registry do
 
     :ets.delete(@table, name)
 
-    @pg_group
-    |> :pg2.get_members()
-    |> Enum.each(fn(pid) ->
+    for pid <- get_subscribers() do
       send(pid, {:delete_channel, name})
-    end)
+    end
 
     {:noreply, new_state}
+  end
+
+  defp get_subscribers() do
+    :ets.foldl(fn({pid}, acc) ->
+      [pid | acc]
+    end, [], @subscription_table)
   end
 end
