@@ -2,13 +2,16 @@ kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: {{ template "fullname" . }}
+  namespace: "{{ .Release.Namespace }}"
   annotations:
     "helm.sh/hook": pre-install
     "helm.sh/hook-weight": "-10"
 rules:
 - apiGroups:
-  - '*'
+    - '*'
   resources:
-    - '*'
+    - endpoints
   verbs:
-    - '*'
+    - get
+    - list
+    - watch

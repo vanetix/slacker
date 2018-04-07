@@ -2,14 +2,14 @@ kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: {{ template "fullname" . }}
-  namespace: "{{.Release.Namespace}}"
+  namespace: "{{ .Release.Namespace }}"
   annotations:
     "helm.sh/hook": pre-install
     "helm.sh/hook-weight": "-8"
 subjects:
 - kind: ServiceAccount
   name: default
-  namespace: "{{.Release.Namespace}}"
+  namespace: "{{ .Release.Namespace }}"
 roleRef:
   kind: Role
   name: {{ template "fullname" . }}
