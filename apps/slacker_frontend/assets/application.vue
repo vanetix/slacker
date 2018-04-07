@@ -67,9 +67,14 @@ export default {
 
       socket.connect();
       channel.join();
-
       channel.on("sync", ({ channels }) => this.channels = channels);
-      channel.on("new-channel", ({ name }) => this.channels.push(name));
+
+      channel.on("new-channel", ({ name }) => {
+        if (!this.channels.includes(name)) {
+          this.channels.push(name);
+        }
+      });
+
       channel.on("delete-channel", ({ name }) => {
         const idx = this.channels.findIndex((channel) => name === channel);
 
