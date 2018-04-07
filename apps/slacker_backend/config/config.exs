@@ -36,7 +36,8 @@ config :libcluster,
       config: [
         mode: :ip, # TODO: Lets change this to :dns at some point
         kubernetes_selector: "elixir-app=slacker",
-        kubernetes_node_basename: "slacker"
+        kubernetes_node_basename: "slacker",
+        polling_interval: 10_000
       ]
     ]
   ]
