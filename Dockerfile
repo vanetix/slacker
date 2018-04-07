@@ -3,6 +3,9 @@ FROM elixir:1.6-alpine
 ENV PORT 8080
 ENV VERSION 0.0.1
 
+# Tell distillery to expand environment variables in vm.args
+ENV REPLACE_OS_VARS true
+
 WORKDIR /var/www/
 
 COPY . .
