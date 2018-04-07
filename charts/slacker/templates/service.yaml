@@ -3,6 +3,8 @@ kind: Service
 metadata:
   name: {{ template "fullname" . }}
   labels:
+    app: {{ template "fullname" . }}
+    elixir-app: {{ template "name" }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
 {{- if .Values.service.annotations }}
   annotations:
