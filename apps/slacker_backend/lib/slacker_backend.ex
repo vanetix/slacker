@@ -54,7 +54,7 @@ defmodule SlackerBackend do
       {:ok, _pid} ->
         {:error, :channel_exists}
       {:error, _reason} ->
-        DynamicSupervisor.start_child(ChannelSupervisor, {Channel, name})
+        DynamicSupervisor.start_child(ChannelSupervisor, {Channel, [name]})
     end
   end
 
@@ -80,5 +80,35 @@ defmodule SlackerBackend do
       {:error, reason} ->
         {:error, reason}
     end
+  end
+
+  def do_handoff(name, messages) do
+    DynamicSupervisor.start_child(ChannelSupervisor, {Channel, [name, messages]})
+  end
+
+  @doc """
+  Drain off the local channel supervisor to other cluster nodes
+  """
+  def drain() do
+    case Node.list() do
+      [] ->
+        {:error, :no_connected_nodes}
+      nodes ->
+        do_drain(nodes)
+    end
+  end
+
+  defp do_drain(nodes) do
+    ChannelSupervisor
+    |> DynamicSupervisor.which_children()
+    |> Enum.map(fn({_, pid, _, _}) ->
+      new_node = Enum.random(nodes)
+      messages = Channel.list_messages(pid)
+      {:ok, name} = Registry.name_for_pid(pid)
+
+      DynamicSupervisor.terminate_child(ChannelSupervisor, pid)
+      :rpc.async_call(new_node, SlackerBackend, :do_handoff, [name, messages])
+    end)
+    |> Enum.map(&(:rpc.yield(&1)))
   end
 end

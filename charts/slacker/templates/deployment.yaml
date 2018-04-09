@@ -25,6 +25,10 @@ spec:
               fieldPath: status.podIP
         ports:
         - containerPort: {{ .Values.service.internalPort }}
+        lifecycle:
+          preStop:
+            exec:
+              command: {{ .Values.preStopCommand }}
         livenessProbe:
           httpGet:
             path: {{ .Values.probePath }}
