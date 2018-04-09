@@ -1,6 +1,9 @@
 defmodule SlackerBackend.Leader.Registry do
   @moduledoc """
   Manages pids of all existing channels on the local node.
+
+
+  TODO: Heartbeat to connected nodes about registry state
   """
 
   use GenServer
@@ -47,6 +50,15 @@ defmodule SlackerBackend.Leader.Registry do
     case :ets.lookup(@table, name) do
       [{^name, pid}] ->
         {:ok, pid}
+      [] ->
+        {:error, :not_found}
+    end
+  end
+
+  def name_for_pid(pid) when is_pid(pid) do
+    case :ets.match(@table, {:"$1", pid}) do
+      [[name] | _] ->
+        {:ok, name}
       [] ->
         {:error, :not_found}
     end

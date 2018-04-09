@@ -1,0 +1,7 @@
+#!/bin/bash
+
+bin/slacker rpc Elixir.SlackerBackend drain
+
+if [ $? -eq 0 ]; then
+  echo "Drained node successfully"
+fi

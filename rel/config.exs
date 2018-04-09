@@ -46,11 +46,16 @@ end
 
 release :slacker do
   set version: "0.0.1"
+  set vm_args: "rel/vm_args.eex"
+
   set applications: [
     :runtime_tools,
     slacker_backend: :permanent,
     slacker_frontend: :permanent
   ]
-  set vm_args: "rel/vm_args.eex"
+
+  set commands: [
+    drain: "rel/commands/drain"
+  ]
 end
 

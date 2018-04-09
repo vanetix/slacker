@@ -3,15 +3,16 @@ defmodule SlackerBackend.Channel do
 
   alias SlackerBackend.Leader.Registry
 
-  def start_link(name) do
-    GenServer.start_link(__MODULE__, name)
+  def start_link(args) do
+    GenServer.start_link(__MODULE__, args)
   end
 
-  def init(name) do
+  def init([name]), do: init([name, []])
+  def init([name, messages]) do
     Registry.register(self(), name)
     :pg2.create(pg_group(name))
 
-    {:ok, %{name: name, messages: []}}
+    {:ok, %{name: name, messages: messages}}
   end
 
   defp pg_group(name), do: {:slacker_backend, "channel_#{name}"}
