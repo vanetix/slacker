@@ -3,6 +3,10 @@ defmodule SlackerFrontendWeb.Endpoint do
 
   socket "/socket", SlackerFrontendWeb.UserSocket
 
+  # Prometheus plug
+  plug SlackerFrontendWeb.Plugs.MetricsExporter
+  plug SlackerFrontendWeb.Plugs.PipelineInstrumenter
+
   # Serve at "/" the static files from "priv/static" directory.
   #
   # You should set gzip to true if you are running phoenix.digest
