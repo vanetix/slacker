@@ -14,6 +14,7 @@ config :slacker_frontend, SlackerFrontendWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "Nya8lWIjkIDovFYUi6NuyuM8a2qKRAz5zk3wT5UCaXAA8VdHzEgiFGL5TOod1ik+",
   render_errors: [view: SlackerFrontendWeb.ErrorView, accepts: ~w(html json)],
+  instrumenters: [SlackerFrontendWeb.Instrumenter],
   pubsub: [name: SlackerFrontend.PubSub,
            adapter: Phoenix.PubSub.PG2]
 

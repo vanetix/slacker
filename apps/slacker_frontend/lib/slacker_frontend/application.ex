@@ -15,6 +15,7 @@ defmodule SlackerFrontend.Application do
     ]
 
     # Start our prometheus instrumentation
+    SlackerFrontendWeb.Instrumenter.setup()
     SlackerFrontendWeb.Plugs.PipelineInstrumenter.setup()
     SlackerFrontendWeb.Plugs.MetricsExporter.setup()
 

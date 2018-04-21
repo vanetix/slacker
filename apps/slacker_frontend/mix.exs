@@ -42,7 +42,8 @@ defmodule SlackerFrontend.Mixfile do
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:gettext, "~> 0.11"},
       {:cowboy, "~> 1.0"},
-      {:prometheus_plugs, "~> 1.1"}
+      {:prometheus_plugs, "~> 1.1"},
+      {:prometheus_phoenix, "~> 1.2"}
     ]
   end
 end
