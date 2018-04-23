@@ -14,6 +14,7 @@ config :slacker_frontend, SlackerFrontendWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "Nya8lWIjkIDovFYUi6NuyuM8a2qKRAz5zk3wT5UCaXAA8VdHzEgiFGL5TOod1ik+",
   render_errors: [view: SlackerFrontendWeb.ErrorView, accepts: ~w(html json)],
+  instrumenters: [SlackerFrontendWeb.Instrumenter],
   pubsub: [name: SlackerFrontend.PubSub,
            adapter: Phoenix.PubSub.PG2]
 
@@ -21,6 +22,9 @@ config :slacker_frontend, SlackerFrontendWeb.Endpoint,
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id]
+
+config :prometheus, SlackerFrontendWeb.Plugs.PipelineInstrumenter,
+  labels: [:status_class, :method, :host, :scheme, :request_path]
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

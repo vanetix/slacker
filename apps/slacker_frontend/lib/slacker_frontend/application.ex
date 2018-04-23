@@ -14,6 +14,11 @@ defmodule SlackerFrontend.Application do
       # worker(SlackerFrontend.Worker, [arg1, arg2, arg3]),
     ]
 
+    # Start our prometheus instrumentation
+    SlackerFrontendWeb.Instrumenter.setup()
+    SlackerFrontendWeb.Plugs.PipelineInstrumenter.setup()
+    SlackerFrontendWeb.Plugs.MetricsExporter.setup()
+
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: SlackerFrontend.Supervisor]
